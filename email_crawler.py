@@ -21,7 +21,7 @@ url_regex = re.compile('<a\s.*?href=[\'"](.*?)[\'"].*?>')
 # url_regex = re.compile('<a\s(?:.*?\s)*?href=[\'"](.*?)[\'"].*?>')
 
 # Maximum number of search results to start the crawl
-MAX_SEARCH_RESULTS = 150
+MAX_SEARCH_RESULTS = 3
 
 EMAILS_FILENAME = 'data/emails.csv'
 DOMAINS_FILENAME = 'data/domains.csv'
@@ -92,7 +92,7 @@ def retrieve_html(url):
 	status = 0
 	try:
 		logger.info("Crawling %s" % url)
-		request = urllib2.urlopen(req)
+		request = urllib2.urlopen(req, timeout = 10)
 	except urllib2.URLError, e:
 		logger.error("Exception at url: %s\n%s" % (url, e))
 	except urllib2.HTTPError, e:
@@ -124,20 +124,21 @@ def find_emails_2_level_deep(url):
 		return email_set
 
 	else:
-		# No email at level 1. Crawl level 2
-		logger.info('No email at level 1.. proceeding to crawl level 2')
-
-		link_set = find_links_in_html_with_same_hostname(url, html)
-		for link in link_set:
-			# Crawl them right away!
-			# Enqueue them too
-			html = retrieve_html(link)
-			if (html == None):
-				continue
-			email_set = find_emails_in_html(html)
-			db.enqueue(link, list(email_set))
+	#	# No email at level 1. Crawl level 2
+	#	logger.info('No email at level 1.. proceeding to crawl level 2')
+  #
+	#	link_set = find_links_in_html_with_same_hostname(url, html)
+	#	for link in link_set:
+	#		# Crawl them right away!
+	#		# Enqueue them too
+	#		html = retrieve_html(link)
+	#		if (html == None):
+	#			continue
+	#		email_set = find_emails_in_html(html)
+	#		db.enqueue(link, list(email_set))
 
 		# We return an empty set
+		logger.info('Done with crawler.')
 		return set()
 
 
