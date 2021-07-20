@@ -22,6 +22,9 @@ class CrawlerDb:
 			Column('url', Unicode, nullable=False),
 			Column('has_crawled', Boolean, default=False),
 			Column('emails', Unicode, nullable=True),
+			Column('location', Unicode, nullable=True),
+			Column('category', Unicode, nullable=True),
+			Column('band', Unicode, nullable=True),
 		)
 
 		# Create the tables
@@ -40,9 +43,11 @@ class CrawlerDb:
 # 			print 'Duplicated: %s' % url
 			return False
 
+		#print("db location: %s" % location)
 		args = [{'url':unicode(url)}]
 		if (emails != None):
-			args = [{'url':unicode(url), 'has_crawled':True, 'emails':unicode(",".join(emails))}]
+			print("db location: %s" % location)
+			args = [{'url':unicode(url), 'has_crawled':True, 'location':unicode(location), 'category':unicode(category), 'band':unicode(keywords), 'emails':unicode(",".join(emails))}]
 		result = self.connection.execute(self.website_table.insert(), args)
 		if result:
 			return True
@@ -69,12 +74,12 @@ class CrawlerDb:
 		return False
 		
 		
-	def crawled(self, website, new_emails=None):
+	def crawled(self, website, new_emails=None, location=None, category=None, keywords=None):
 		if not self.connected:
 			return False
 		stmt = self.website_table.update() \
 			.where(self.website_table.c.id==website.id) \
-			.values(has_crawled=True, emails=new_emails)
+			.values(has_crawled=True, emails=new_emails, location=location, category=category, band=keywords)
 		self.connection.execute(stmt)
 
 

@@ -31,7 +31,7 @@ db = CrawlerDb()
 db.connect()
 
 
-def crawl(keywords):
+def crawl(keywords, location, category):
 	"""
 	This method will
 
@@ -51,6 +51,8 @@ def crawl(keywords):
 	"""
 	logger.info("-"*40)
 	logger.info("Keywords to Google for: %s" % keywords.decode('utf-8'))
+	logger.info("Location: %s" % location.decode('utf-8'))
+	logger.info("Category: %s" % category.decode('utf-8'))
 	logger.info("-"*40)
 
 	# Step 1: Crawl Google Page
@@ -62,6 +64,7 @@ def crawl(keywords):
 		url = 'http://www.google.com/search?' + urllib.urlencode(query) + '&start=' + str(page_index)
 		data = retrieve_html(url)
 		# 	print("data: \n%s" % data)
+		# print("location: %s" % location)
 		for url in google_url_regex.findall(data):
 			db.enqueue(unicode(url))
 		for url in google_adurl_regex.findall(data):
@@ -76,7 +79,7 @@ def crawl(keywords):
 			break
 		email_set = find_emails_2_level_deep(uncrawled.url)
 		if (len(email_set) > 0):
-			db.crawled(uncrawled, ",".join(list(email_set)))
+			db.crawled(uncrawled, ",".join(list(email_set)), unicode(location), unicode(category), unicode(keywords))
 		else:
 			db.crawled(uncrawled, None)
 
@@ -186,6 +189,8 @@ if __name__ == "__main__":
 	import sys
 	try:
 		arg = sys.argv[1].lower()
+		location = sys.argv[2]
+		category = sys.argv[3]
 		if (arg == '--emails') or (arg == '-e'):
 			# Get all the emails and save in a CSV
 			logger.info("="*40)
@@ -210,7 +215,7 @@ if __name__ == "__main__":
 			logger.info("="*40)
 		else:
 			# Crawl the supplied keywords!
-			crawl(arg)
+			crawl(arg, location, category)
 
 	except KeyboardInterrupt:
 		logger.error("Stopping (KeyboardInterrupt)")
