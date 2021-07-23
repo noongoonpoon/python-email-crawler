@@ -61,7 +61,7 @@ def crawl(keywords, location, category):
 	# Google search results are paged with 10 urls each. There are also adurls
 	for page_index in range(0, MAX_SEARCH_RESULTS, 10):
 		query = {'q': keywords}
-		url = 'http://www.google.com/search?' + urllib.urlencode(query) + '&start=' + str(page_index)
+		url = 'http://www.google.com/search?' + urllib.urlencode(query) + '+contact'+ '&start=' + str(page_index)
 		data = retrieve_html(url)
 		# 	print("data: \n%s" % data)
 		# print("location: %s" % location)
@@ -95,7 +95,7 @@ def retrieve_html(url):
 	status = 0
 	try:
 		logger.info("Crawling %s" % url)
-		request = urllib2.urlopen(req, timeout = 10)
+		request = urllib2.urlopen(req, timeout = 3)
 	except urllib2.URLError, e:
 		logger.error("Exception at url: %s\n%s" % (url, e))
 	except urllib2.HTTPError, e:
